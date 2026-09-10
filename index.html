@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Plan de Inversión</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="contenedor">
+        <div class="contenedor-datos">
+            <h1>Planificador de Inversión</h1>
+            <div class="datos">
+                <div class="nacimiento">
+                    <label for="fechaNacimiento">Fecha de nacimiento:</label>
+                    <input type="date" id="fechaNacimiento">
+                </div>
+                <div class="salario">
+                    <label for="salario">Ingresos mensuales ($):</label>
+                    <input type="text" id="salario" placeholder="Ej: 500.000" data-valor="0">
+                </div>
+                <div class="ahorro">
+                    <label for="ahorros-totales">Ahorros actuales ($):</label>
+                    <input type="text" id="ahorros-totales" placeholder="Ej: 1.500.000" data-valor="0">
+                </div>
+            </div>
+            <button id="botonCalcular">Calcular Plan</button>
+        </div>
+
+        <div id="mensaje"></div>
+    </div>
+    
+  <script>
+    // guardo contantes que ingresa las personas
+    const inputFecha = document.getElementById("fechaNacimiento");
+    const inputSalario = document.getElementById("salario");
+    const inputAhorros = document.getElementById("ahorros-totales");
+
+    const boton = document.getElementById("botonCalcular");
+    const mensaje = document.getElementById("mensaje");
+
+    // funcion para agregar los puntos
+    function formatearInput(input) {
+        input.addEventListener("input", function() {
+            let limpio = this.value.replace(/\D/g, '');
+            this.dataset.valor = limpio || 0;
+            this.value = limpio ? Number(limpio).toLocaleString('de-DE') : '';
+        });
+    }
+
+    // llamo a la funcion
+    formatearInput(inputSalario);
+    formatearInput(inputAhorros);
+
+    inputFecha.max = new Date().toISOString().split("T")[0];
+
+    function obtenerEdad(fechaOrigen) {
+        const nacimiento = new Date(fechaOrigen + "T00:00:00");
+        const hoy = new Date();
+
+        if (isNaN(nacimiento.getTime()) || nacimiento > hoy) {
+            return null; 
+        }
+
+        let anios = hoy.getFullYear() - nacimiento.getFullYear();
+        let meses = hoy.getMonth() - nacimiento.getMonth();
+        if (hoy.getDate() < nacimiento.getDate()) meses--;
+        
+        if (meses < 0) {
+            anios--;
+            meses += 12;
+        }
+
+        return { anios, meses };
+    }
+
+    function montoMensual () {
+        if (!inputFecha.value) {
+            mensaje.innerHTML = `⚠️ <strong>Error:</strong> Por favor, selecciona tu fecha de nacimiento antes de calcular.`;
+            return;
+        }
+        const datosEdad = obtenerEdad(inputFecha.value);
+        const { anios, meses } = datosEdad;
+        if (anios < 20) {
+            mensaje.innerHTML = `🎈 <strong>¡Tenés ${anios} años!</strong> Despreocupate de la plata por ahora, ¡disfrutá tu juventud!`;
+            return;
+        }
+
+        const salarioVal = Number(inputSalario.dataset.valor) || 0;
+        if (salarioVal < 1) {
+            mensaje.innerHTML = `⚠️ <strong>Error:</strong> Por favor, ingresa tus ingresos mensuales para poder armar el plan.`;
+            return;
+        }
+
+        const ahorrosVal = Number(inputAhorros.dataset.valor) || 0;
+
+        const proximaEdadRedonda = (Math.floor(anios / 10) + 1) * 10;
+        const mesesVividos = (((anios - (Math.floor(anios / 10) * 10) ) * 12) + meses);
+
+        const tiempoRestante = 120 - mesesVividos
+        
+        const montoFinal = salarioVal * 12
+
+        const montoMensual = (montoFinal - ahorrosVal) / tiempoRestante 
+
+        const fmt = (num) => Math.round(num).toLocaleString('de-DE');
+
+        if (montoMensual <= 0) {
+            mensaje.innerHTML = `🎉 <strong>¡Felicitaciones!</strong> Tus ahorros actuales de $${fmt(ahorrosVal)} ya superan la meta de $${fmt(montoFinal)} requerida para tus ${proximaEdadRedonda} años.`;
+        }
+        else {
+            mensaje.innerHTML = `👉 <strong>Debes ahorrar al mes:</strong> $${fmt(montoMensual)} durante los próximos $${fmt(tiempoRestante)} meses para llegar a los $${fmt(montoFinal)}.`;
+        }
+    }
+    
+        boton.addEventListener("click", montoMensual);
+    </script>
+    </body>
+</html>
