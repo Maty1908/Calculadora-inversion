@@ -1,33 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora de Plan de Inversión</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Plan de Inversión</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="contenedor">
-        <div class="contenedor-datos">
+    <div class="cuerpo">
+        <div class="header">
             <h1>Planificador de Inversión</h1>
-            <div class="datos">
-                <div class="nacimiento">
-                    <label for="fechaNacimiento">Fecha de nacimiento:</label>
-                    <input type="date" id="fechaNacimiento">
+        </div>
+        <div class="contenedor-datos">
+            <div class="contenedor">
+                <div class="datos">
+                    <div class="nacimiento">
+                        <label for="fechaNacimiento">Fecha de nacimiento:</label>
+                        <input type="date" id="fechaNacimiento">
+                    </div>
+                    <div class="salario">
+                        <label for="salario">Ingresos mensuales ($):</label>
+                        <input type="text" id="salario" placeholder="Ej: 500.000" data-valor="0">
+                    </div>
+                    <div class="ahorro">
+                        <label for="ahorros-totales">Ahorros actuales ($):</label>
+                        <input type="text" id="ahorros-totales" placeholder="Ej: 1.500.000" data-valor="0">
+                    </div>
                 </div>
-                <div class="salario">
-                    <label for="salario">Ingresos mensuales ($):</label>
-                    <input type="text" id="salario" placeholder="Ej: 500.000" data-valor="0">
-                </div>
-                <div class="ahorro">
-                    <label for="ahorros-totales">Ahorros actuales ($):</label>
-                    <input type="text" id="ahorros-totales" placeholder="Ej: 1.500.000" data-valor="0">
-                </div>
+                <div class="contenedor-resultado">
+                    <h2 class="resultado">Resultado:</h2>
+                    <div id="mensaje"></div>
+
+                </div> 
             </div>
             <button id="botonCalcular">Calcular Plan</button>
         </div>
-
-        <div id="mensaje"></div>
     </div>
     
   <script>
@@ -95,25 +102,25 @@
         const ahorrosVal = Number(inputAhorros.dataset.valor) || 0;
 
         const proximaEdadRedonda = (Math.floor(anios / 10) + 1) * 10;
-        const mesesVividos = (((anios - (Math.floor(anios / 10) * 10) ) * 12) + meses);
-
-        const tiempoRestante = 120 - mesesVividos
+        const aniosRestantes = proximaEdadRedonda - anios;
         
-        const montoFinal = salarioVal * 12
+        const tiempoRestante = (aniosRestantes * 12) - meses;
+        
+        const montoFinal = salarioVal * 12 * aniosRestantes;
 
-        const montoMensual = (montoFinal - ahorrosVal) / tiempoRestante 
+        const montoMensualCalculado = (montoFinal - ahorrosVal) / tiempoRestante; 
 
         const fmt = (num) => Math.round(num).toLocaleString('de-DE');
 
-        if (montoMensual <= 0) {
+        if (montoMensualCalculado <= 0) {
             mensaje.innerHTML = `🎉 <strong>¡Felicitaciones!</strong> Tus ahorros actuales de $${fmt(ahorrosVal)} ya superan la meta de $${fmt(montoFinal)} requerida para tus ${proximaEdadRedonda} años.`;
         }
         else {
-            mensaje.innerHTML = `👉 <strong>Debes ahorrar al mes:</strong> $${fmt(montoMensual)} durante los próximos $${fmt(tiempoRestante)} meses para llegar a los $${fmt(montoFinal)}.`;
+            mensaje.innerHTML = `👉 <strong>Debes ahorrar al mes:</strong> $${fmt(montoMensualCalculado)} durante los próximos <strong>${tiempoRestante} meses</strong> para llegar a los $${fmt(montoFinal)}.`;
         }
     }
     
-        boton.addEventListener("click", montoMensual);
-    </script>
-    </body>
+    boton.addEventListener("click", montoMensual);
+  </script>
+</body>
 </html>
