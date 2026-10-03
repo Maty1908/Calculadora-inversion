@@ -102,12 +102,17 @@
         const ahorrosVal = Number(inputAhorros.dataset.valor) || 0;
 
         const proximaEdadRedonda = (Math.floor(anios / 10) + 1) * 10;
-        const aniosRestantes = proximaEdadRedonda - anios;
         
-        const tiempoRestante = (aniosRestantes * 12) - meses;
+        // Meses totales vividos dentro de la década actual (ej: si tienes 25 años y 6 meses, son 5 años y 6 meses = 66 meses)
+        const mesesVividosEnDecada = ((anios % 10) * 12) + meses;
         
-        const montoFinal = salarioVal * 12 * aniosRestantes;
+        // Una década tiene 120 meses en total. El tiempo restante son los meses que faltan para llegar al hito.
+        const tiempoRestante = 120 - mesesVividosEnDecada;
 
+        // La meta es acumular 1 año de sueldo por cada década cumplida (12 meses de sueldo por cada bloque de 10 años = 120 meses de sueldo total al llegar al hito)
+        const montoFinal = salarioVal * 12; 
+
+        // Restamos ahorros y dividimos exactamente por los meses restantes reales
         const montoMensualCalculado = (montoFinal - ahorrosVal) / tiempoRestante; 
 
         const fmt = (num) => Math.round(num).toLocaleString('de-DE');
@@ -116,7 +121,7 @@
             mensaje.innerHTML = `🎉 <strong>¡Felicitaciones!</strong> Tus ahorros actuales de $${fmt(ahorrosVal)} ya superan la meta de $${fmt(montoFinal)} requerida para tus ${proximaEdadRedonda} años.`;
         }
         else {
-            mensaje.innerHTML = `👉 <strong>Debes ahorrar al mes:</strong> $${fmt(montoMensualCalculado)} durante los próximos <strong>${tiempoRestante} meses</strong> para llegar a los $${fmt(montoFinal)}.`;
+            mensaje.innerHTML = `👉 <strong>Debes ahorrar al mes:</strong> $${fmt(montoMensualCalculado)} durante los próximos <strong>${tiempoRestante} meses</strong> (hasta tus ${proximaEdadRedonda} años) para llegar a los $${fmt(montoFinal)}.`;
         }
     }
     
